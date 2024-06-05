@@ -1,7 +1,7 @@
-# TODO: write the mission node
+#!/usr/bin/env python3
 
 from merlin2_mission import Merlin2FsmMissionNode
-from .pddl import room_type, room_patrolled, room_at
+from merlin2_hospital_patrolling.pddl import room_type, room_patrolled, room_at
 from merlin2_basic_actions.merlin2_basic_types import wp_type
 from merlin2_basic_actions.merlin2_basic_predicates import robot_at
 
@@ -39,7 +39,7 @@ class MissionNode(Merlin2FsmMissionNode):
             transitions={SUCCEED: "CHECKING_GOALS"},
         )
 
-    def create_objects(self) -> List[PddlObjectDto]:
+    def create_objects(self):
 
         self.wp0 = PddlObjectDto(wp_type, "wp0")
         self.wp1 = PddlObjectDto(wp_type, "wp1")
@@ -68,7 +68,7 @@ class MissionNode(Merlin2FsmMissionNode):
             self.room5,
         ]
 
-    def create_propositions(self) -> List[PddlPropositionDto]:
+    def create_propositions(self):
 
         return [
             PddlPropositionDto(robot_at, [self.wp0]),
@@ -92,11 +92,11 @@ class MissionNode(Merlin2FsmMissionNode):
 
     def check_goals(self, blackboard: Blackboard) -> str:
 
-        if not blackboard.goals:
-            return self.END
+        if blackboard.goals:
+            blackboard.next_goal = blackboard.goals.pop(0)
+            return self.HAS_NEXT
 
-        blackboard.next_goal = blackboard.goals.pop(0)
-        return self.HAS_NEXT
+        return self.END
 
     def execute(self, blackboard: Blackboard) -> str:
 

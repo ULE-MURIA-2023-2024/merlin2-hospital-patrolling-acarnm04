@@ -1,10 +1,9 @@
-# TODO: write the patrol FSM action
+#!/usr/bin/env python3
 
-from .pddl import room_type, room_patrolled, room_at
+from merlin2_hospital_patrolling.pddl import room_type, room_patrolled, room_at
 from merlin2_basic_actions.merlin2_basic_types import wp_type
 from merlin2_basic_actions.merlin2_basic_predicates import robot_at
-from merlin2_fsm_action import Merlin2BasicStates
-from merlin2_fsm_action import Merlin2FsmAction
+from merlin2_fsm_action import Merlin2BasicStates, Merlin2FsmAction
 
 from yasmin import Blackboard
 from yasmin_ros.basic_outcomes import SUCCEED
@@ -23,9 +22,9 @@ class Merlin2RoomPatrolFsmAction(Merlin2FsmAction):
         self._room = PddlObjectDto(room_type, "room")
         self._wp = PddlObjectDto(wp_type, "wp")
 
-        self.rotate_pub = self.create_publisher(Twist, "/cmd_vel", 10)
-
         super().__init__("room_patrol")
+
+        self.rotate_pub = self.create_publisher(Twist, "/cmd_vel", 10)
 
         tts_state = self.create_state(Merlin2BasicStates.TTS)
 
@@ -58,17 +57,17 @@ class Merlin2RoomPatrolFsmAction(Merlin2FsmAction):
         blackboard.text = f"Patrolling room {room_name}."
         return SUCCEED
 
-    def create_parameters(self) -> List[PddlObjectDto]:
+    def create_parameters(self):
         return [self._room, self._wp]
 
-    def create_conditions(self) -> List[PddlConditionEffectDto]:
+    def create_conditions(self):
 
-        cond_1 = PddlConditionEffectDto(
-            room_patrolled,
-            [self._room],
-            PddlConditionEffectDto.AT_START,
-            is_negative=False,
-        )
+        # cond_1 = PddlConditionEffectDto(
+        #     room_patrolled,
+        #     [self._room],
+        #     PddlConditionEffectDto.AT_START,
+        #     is_negative=False,
+        # )
         cond_2 = PddlConditionEffectDto(
             robot_at, [self._wp], PddlConditionEffectDto.AT_START
         )
@@ -76,15 +75,15 @@ class Merlin2RoomPatrolFsmAction(Merlin2FsmAction):
             room_at, [self._room, self._wp], PddlConditionEffectDto.AT_START
         )
 
-        return [cond_1, cond_2, cond_3]
+        return [cond_2, cond_3]
 
-    def create_effects(self) -> List[PddlConditionEffectDto]:
+    def create_efects(self):
 
-        cond_1 = PddlConditionEffectDto(
+        effect_1 = PddlConditionEffectDto(
             room_patrolled, [self._room], PddlConditionEffectDto.AT_END
         )
 
-        return [cond_1]
+        return [effect_1]
 
 
 def main():
