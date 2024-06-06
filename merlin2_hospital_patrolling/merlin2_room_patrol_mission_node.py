@@ -35,7 +35,7 @@ class MissionNode(Merlin2FsmMissionNode):
         )
         self.add_state(
             "EXECUTE",
-            CbState([SUCCEED], self.execute),
+            CbState([SUCCEED], self.execute_goals),
             transitions={SUCCEED: "CHECKING_GOALS"},
         )
 
@@ -98,7 +98,7 @@ class MissionNode(Merlin2FsmMissionNode):
 
         return self.END
 
-    def execute(self, blackboard: Blackboard) -> str:
+    def execute_goals(self, blackboard: Blackboard) -> str:
 
         self.execute_goal(blackboard.next_goal)
         return SUCCEED
